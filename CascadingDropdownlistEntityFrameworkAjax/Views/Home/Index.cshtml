@@ -1,0 +1,56 @@
+﻿@model CascadingDropdownlistEntityFrameworkAjax.Models.Country
+
+@{
+    ViewBag.Title = "Index";
+
+    <script src="~/Scripts/jquery-3.1.1.min.js"></script>
+}
+
+<script>
+    $(function () {
+        $("#CountryId").change(function () {
+            var isZero = $("#CountryId").val();
+            if ($("#CountryId").val() == "") {
+                isZero = 0;
+                $("#CityId").empty();
+                $("#CityId").append('<option value="0">--Select City--</option>');
+            }
+            $.get("/Home/GetAllStatesByCountryId", { CountryID: isZero }, function (data) {
+                $("#StateId").empty();
+                $("#StateId").append('<option value="0">--Select State--</option>');
+                $.each(data, function (index, row) {
+                    $("#StateId").append("<option value='"+row.StateId+"'>"+row.StateName+"</option>");
+                })
+            })
+        })
+    })
+
+
+    $(function () {
+        $("#StateId").change(function () {
+            $.get("/Home/GetAllCitiesByStateId", { StateID: $("#StateId").val() }, function (data) {
+                $("#CityId").empty();
+               // alert($("#StateId").val());
+                // alert("hi");
+                $("#CityId").append('<option value="0">--Select City--</option>');
+
+                $.each(data, function (index, row) {
+                    $("#CityId").append("<option value='" + row.CityId + "'>" + row.CityName + "</option>");
+                })
+                })
+           
+        })
+    })
+</script>
+
+<h2>Index</h2>
+
+@Html.DropDownListFor(p => p.CountryId, ViewBag.CountryName as SelectList, "--Select country--" , new { id = "CountryId"})
+<select id="StateId" class="form-control">
+     <option value="0">--Select State--</option>
+               
+</select>
+
+<select id="CityId" class="form-control">
+    <option value="0">--Select City--</option>
+</select>
